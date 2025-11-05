@@ -18,4 +18,3 @@ partial def everything (d : List Type)
 | f, a =>
   f (to.gmap (fun {β} [Typeable β] [among : Among β d] (p : β)  =>
       let _ := ts.allTerms among.witness; everything d f p) a)
-
