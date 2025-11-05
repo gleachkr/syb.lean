@@ -1,0 +1,6 @@
+name = "syb-lean"
+version = "0.1.0"
+defaultTargets = ["syb-lean"]
+
+[[lean_lib]]
+name = "Syb"
