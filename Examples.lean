@@ -16,4 +16,4 @@ abbrev miniverse := [List Nat, Nat, List (List Nat)]
 
 #eval everything miniverse (fun {_} => mkT Nat.succ) ([1,2,3])
 
-#eval everything miniverse (fun {_} => mkT Nat.succ) ([[1,2],[3]])
+#eval everything' miniverse (fun {_} => mkT Nat.succ) ([[1,2],[3]])

@@ -33,8 +33,7 @@ instance [instA : Typeable α] [instB : Typeable β] : Typeable (α → β) wher
   typeOf _ := .app (.app (.typeRep "→") instA.typeRep) instB.typeRep
   typeRep := .app (.app (.typeRep "→") instA.typeRep) instB.typeRep
 
-instance [Among (List α) d] [Among α d]
-  [Typeable α] [Typeable (List α)] : TermOf (List α) d where
+instance [Among (List α) d] [Among α d] : TermOf (List α) d where
   witness := Among.witness
   gmap
   | _, []      => []
