@@ -31,7 +31,8 @@ instance [h : Among α d] : Among α (β :: d) where
 -- Classes
 
 class TermOf (α : Type u) (d : List (Type u)) extends Among α d where
-  gmap  : (∀ {β}, ∀ [Among β d], β → β) → α → α
+  gmapT  : (∀ {β}, ∀ [Among β d], β → β) → α → α
+  gmapQ  : (∀ {β}, ∀ [Among β d], β → ρ) → α → List ρ 
 
 class Terms (d : List (Type u)) where
   allTerms : ∀ {β}, Member β d → TermOf β d
@@ -41,21 +42,31 @@ def TermOf.lift (i : TermOf β d) : TermOf β (γ :: d) where
   typeRep := i.typeRep
   typeOf := i.typeOf
   witness := .tail i.witness
-  gmap F b := i.gmap (fun {_} => F) b
+  gmapT F b := i.gmapT (fun {_} => F) b
+  gmapQ F b := i.gmapQ (fun {_} => F) b
 
 /-- Promote a singleton-family instance `TermOf α [α]` to any family `d`
     where `α` is a member. Useful for base types whose `gmap` ignores `F`.
     Prefer more informative instances (like containers) when available. -/
 def TermOf.ofSingleton [Among α d] (i : TermOf α [α]) : TermOf α d where
   witness := Among.witness
-  gmap F a :=
-    i.gmap
+  gmapT F a :=
+    i.gmapT
       (fun {δ} [m : Among δ [α]] => by
         cases m.witness with
         | head => exact F (β := α)
         | tail m' => contradiction
       )
       a
+  gmapQ F a :=
+    i.gmapQ
+      (fun {δ} [m : Among δ [α]] => by
+        cases m.witness with
+        | head => exact F (β := α)
+        | tail m' => contradiction
+      )
+      a
+
 
 /-- Low-priority instance: lift `TermOf α [α]` to any `d` where `α ∈ d`.
     More specific instances (e.g. for container shapes) should win. -/

@@ -18,15 +18,23 @@ def mkQ [Typeable α] [Typeable β]  (r : γ) (q : β → γ) (a : α) : γ :=
     | .none => r
 
 /-- Bottom up recursion strategy -/
-partial def everything (d : List Type)
+partial def everywhere (d : List Type)
   [ts : Terms d] [to : TermOf α d] : (∀ {β}, ∀[Among β d], β → β) → α → α
 | f, a =>
-  f (to.gmap (fun {_} [among : Among _ d] =>
-      have := ts.allTerms among.witness; everything d f) a)
+  f (to.gmapT (fun {_} [among : Among _ d] =>
+      have := ts.allTerms among.witness; everywhere d f) a)
 
 /-- Top down recursion strategy -/
-def everything' (d : List Type)
+partial def everywhere' (d : List Type)
   [ts : Terms d] [to : TermOf α d] : (∀ {β}, ∀[Among β d], β → β) → α → α
 | f, a =>
-  to.gmap (fun {_} [among : Among _ d] =>
-      have := ts.allTerms among.witness; everything d f) (f a)
+  to.gmapT (fun {_} [among : Among _ d] =>
+      have := ts.allTerms among.witness; everywhere' d f) (f a)
+
+partial def everything (d : List Type)
+  [ts: Terms d] [to : TermOf α d] [Inhabited ρ] : 
+  (ρ → ρ → ρ) → (∀{β}, ∀[Among β d], β → ρ) → α → ρ
+| k, f, x =>
+  (to.gmapQ (fun {_} [among : Among _ d] =>
+      have := ts.allTerms among.witness; everything d k f) x).foldl k 
+      (f x)

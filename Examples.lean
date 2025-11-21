@@ -12,8 +12,12 @@ import Syb.Syb
 
 abbrev miniverse := [List Nat, Nat, List (List Nat)]
 
-#eval everything miniverse (fun {_} => mkT Nat.succ) 1
+#eval everywhere miniverse (fun {_} => mkT Nat.succ) 1
 
-#eval everything miniverse (fun {_} => mkT Nat.succ) ([1,2,3])
+#eval everywhere miniverse (fun {_} => mkT Nat.succ) ([1,2,3])
 
-#eval everything' miniverse (fun {_} => mkT Nat.succ) ([[1,2],[3]])
+#eval everywhere' miniverse (fun {_} => mkT Nat.succ) ([[1,2],[3]])
+
+#eval everything miniverse List.append
+  (fun {_} => mkQ [] (λx => if x % 2 == 0 then [x] else []))
+  ([[1,2],[3,4]])

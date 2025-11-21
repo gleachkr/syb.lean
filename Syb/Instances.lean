@@ -35,10 +35,14 @@ instance [instA : Typeable α] [instB : Typeable β] : Typeable (α → β) wher
 
 instance [Among (List α) d] [Among α d] : TermOf (List α) d where
   witness := Among.witness
-  gmap
+  gmapT
   | _, []      => []
   | f, x :: xs => f x :: f xs
+  gmapQ
+  | _, []      => []
+  | f, x :: xs => [f x, f xs]
 
 instance : TermOf Nat [Nat] where
   witness := Among.witness
-  gmap _ n := n
+  gmapT _ n := n
+  gmapQ _ _ := []
