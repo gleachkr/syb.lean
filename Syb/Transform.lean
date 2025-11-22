@@ -17,10 +17,15 @@ def mkQ [Typeable α] [Typeable β]  (r : γ) (q : β → γ) (a : α) : γ :=
     | .some b => q b
     | .none => r
 
+def mkM [Monad μ] [Typeable α] [Typeable β] [Typeable (μ α)] [Typeable (μ β)]  (f : β → μ β) : α → μ α :=
+   match Typeable.cast f with
+    | .some g => g
+    | .none => pure
+
 /-- Bottom up recursion strategy -/
 partial def everywhere (d : List Type)
-  [ts : Terms d] [to : TermOf α d] : (∀ {β}, ∀[Among β d], β → β) → α → α
-| f, a =>
+  [ts : Terms d]  : (∀ {β}, ∀[Among β d], β → β) → (∀{α}, ∀[TermOf α d], α → α)
+  | f, _, to, a =>
   f (to.gmapT (fun {_} [among : Among _ d] =>
       have := ts.allTerms among.witness; everywhere d f) a)
 
