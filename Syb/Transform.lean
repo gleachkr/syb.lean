@@ -22,24 +22,29 @@ def mkM [Monad μ] [Typeable α] [Typeable β] [Typeable (μ α)] [Typeable (μ 
     | .some g => g
     | .none => pure
 
+-- Among is redundant, but lean has a hard time finding the instance otherwise,
+-- so this is arguably more convenient.
+abbrev GenericT d := (∀{α}, ∀[Among α d], ∀[TermOf α d], α → α)
+
 /-- Bottom up recursion strategy -/
 partial def everywhere (d : List Type)
-  [ts : Terms d]  : (∀ {β}, ∀[Among β d], β → β) → (∀{α}, ∀[TermOf α d], α → α)
-  | f, _, to, a =>
+  [ts : Terms d]  : GenericT d → GenericT d
+  | f, _, _, to, a =>
   f (to.gmapT (fun {_} [among : Among _ d] =>
       have := ts.allTerms among.witness; everywhere d f) a)
 
 /-- Top down recursion strategy -/
 partial def everywhere' (d : List Type)
-  [ts : Terms d] [to : TermOf α d] : (∀ {β}, ∀[Among β d], β → β) → α → α
-| f, a =>
+  [ts : Terms d] : GenericT d → GenericT d
+  | f, _, _, to, a =>
   to.gmapT (fun {_} [among : Among _ d] =>
       have := ts.allTerms among.witness; everywhere' d f) (f a)
 
+abbrev GenericQ d ρ := (∀{α}, ∀[Among α d], ∀[TermOf α d], α → ρ)
+
 partial def everything (d : List Type)
-  [ts: Terms d] [to : TermOf α d] [Inhabited ρ] : 
-  (ρ → ρ → ρ) → (∀{β}, ∀[Among β d], β → ρ) → α → ρ
-| k, f, x =>
+  [ts: Terms d] [Inhabited ρ] : 
+  (ρ → ρ → ρ) → GenericQ d ρ → GenericQ d ρ
+  | k, f, _, _, to, x =>
   (to.gmapQ (fun {_} [among : Among _ d] =>
-      have := ts.allTerms among.witness; everything d k f) x).foldl k 
-      (f x)
+      have := ts.allTerms among.witness; everything d k f) x).foldl k (f x)

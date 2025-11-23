@@ -10,6 +10,10 @@ import Syb.Syb
 
 #eval mkT Nat.succ 1
 
+#eval mkQ [] (λx => if x % 2 == 0 then [x] else []) false 
+
+#eval mkQ [] (λx => if x % 2 == 0 then [x] else []) 2
+
 abbrev miniverse := [List Nat, Nat, List (List Nat)]
 
 #eval everywhere miniverse (fun {_} => mkT Nat.succ) 1
