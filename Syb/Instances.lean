@@ -42,7 +42,7 @@ instance [Among (List α) d] [Among α d] : TermOf (List α) d where
   | _, []      => []
   | f, x :: xs => [f x, f xs]
 
-instance : TermOf Nat [Nat] where
+instance [Typeable α] : TermOf α [α] where
   witness := Among.witness
-  gmapT _ n := n
+  gmapT _ t := t
   gmapQ _ _ := []

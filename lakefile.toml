@@ -1,6 +1,7 @@
 name = "syb-lean"
 version = "0.1.0"
-defaultTargets = ["syb-lean"]
+defaultTargets = ["Syb"]
 
 [[lean_lib]]
 name = "Syb"
+root = "Syb"
